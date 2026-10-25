@@ -1,5 +1,6 @@
 {
   "name": "leica-settings-studio",
+  "productName": "Leica Setting Studio",
   "version": "1.0.0",
   "type": "commonjs",
   "description": "Desktop application to view, compare, and adjust Leica camera settings (.lcs files)",
