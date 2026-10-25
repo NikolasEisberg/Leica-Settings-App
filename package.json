@@ -1,0 +1,15 @@
+{
+  "name": "leica-settings-studio",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "description": "Desktop application to view, compare, and adjust Leica camera settings (.lcs files)",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "start:mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron .",
+    "test": "node test/verify-lcs.js"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}

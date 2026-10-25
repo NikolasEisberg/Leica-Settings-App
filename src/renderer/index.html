@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leica Settings Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- macOS Draggable Titlebar -->
+  <header class="app-titlebar">
+    <div class="titlebar-brand">
+      <span class="leica-red-dot" title="Leica Settings Studio"></span>
+      <span class="titlebar-title">LEICA SETTINGS STUDIO</span>
+      <span class="titlebar-subtitle">Camera Configuration &amp; .LCS Profile Manager</span>
+    </div>
+    <div class="titlebar-status">
+      <span id="save-status-indicator" class="status-pill">All changes saved</span>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Left Sidebar: Multi-Configuration Library -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Configurations</h2>
+        <div class="sidebar-actions">
+          <button id="btn-import-lcs" class="btn btn-secondary btn-sm" title="Import an existing .lcs file">
+            + Import .lcs
+          </button>
+          <button id="btn-new-config" class="btn btn-ghost btn-sm" title="Create a new configuration from factory defaults">
+            + Default
+          </button>
+        </div>
+      </div>
+
+      <div id="config-list" class="config-list">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="dropzone-hint" id="dropzone-box">
+          <div class="dropzone-title">Drop <code>.lcs</code> file anywhere</div>
+          <div class="dropzone-sub">Imports into your persistent library</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- Active Configuration Header Bar -->
+      <section class="config-toolbar">
+        <div class="config-meta-group">
+          <div class="field-group">
+            <label for="input-config-name">Configuration Name</label>
+            <input
+              id="input-config-name"
+              type="text"
+              class="text-input config-name-input"
+              placeholder="e.g. Street Photography Setup"
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="select-camera-model">Camera Model</label>
+            <select
+              id="select-camera-model"
+              class="dropdown-select camera-model-select"
+              disabled
+              title="Locked to LEICA Q3 (from example settings.lcs)"
+            >
+              <option value="LEICA Q3" selected>LEICA Q3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="config-actions-group">
+          <button id="btn-duplicate-config" class="btn btn-secondary" title="Duplicate this configuration">
+            Duplicate
+          </button>
+          <button id="btn-delete-config" class="btn btn-ghost-danger" title="Delete this configuration">
+            Delete
+          </button>
+          <button id="btn-open-export" class="btn btn-primary">
+            Export .lcs File…
+          </button>
+        </div>
+      </section>
+
+      <!-- 7-Slot Profile Bar -->
+      <section class="profile-bar">
+        <div class="profile-slots-header">
+          <div class="profile-slots-title">
+            <span>Camera Profile Slots (7-Slot Array)</span>
+            <span class="profile-slots-hint">Select which profile slot inside this .lcs file to view and adjust</span>
+          </div>
+
+          <div class="profile-bulk-controls">
+            <label class="checkbox-label" title="When editing Slot 1, automatically mirror changes to Slot 0 (Active Camera State)">
+              <input type="checkbox" id="chk-sync-slot0" />
+              <span>Mirror Slot 1 edits to Slot 0 (Active State)</span>
+            </label>
+
+            <div class="copy-slot-group">
+              <select id="select-copy-target" class="dropdown-select dropdown-sm">
+                <option value="">Copy current slot to…</option>
+                <option value="0">→ Slot 0 (Active State)</option>
+                <option value="1">→ Slot 1 (Profile 1)</option>
+                <option value="2">→ Slot 2 (Profile 2)</option>
+                <option value="3">→ Slot 3 (Profile 3)</option>
+                <option value="4">→ Slot 4 (Profile 4)</option>
+                <option value="5">→ Slot 5 (Profile 5)</option>
+                <option value="6">→ Slot 6 (Profile 6)</option>
+                <option value="all">⇉ All 7 Slots</option>
+              </select>
+              <button id="btn-copy-slot" class="btn btn-secondary btn-sm">Apply Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="profile-tabs" class="profile-tabs">
+          <!-- 7 Slot tabs populated dynamically -->
+        </div>
+
+        <!-- Profile Name Editor (Shown for Slots 1-6) -->
+        <div id="profile-name-bar" class="profile-name-bar">
+          <div class="profile-name-left">
+            <span id="profile-name-key-badge" class="hex-badge">Profile 1</span>
+            <label for="input-profile-name">Profile Name (Open Input, 3–10 chars):</label>
+            <input
+              id="input-profile-name"
+              type="text"
+              maxlength="10"
+              class="text-input profile-name-input"
+              placeholder="Profile Name"
+            />
+            <span id="profile-name-char-count" class="char-counter">7/10</span>
+          </div>
+          <div class="profile-name-right">
+            <label for="select-profile-suggestion">Quick Name Preset:</label>
+            <select id="select-profile-suggestion" class="dropdown-select dropdown-sm">
+              <option value="">Choose suggestion…</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Navigation Tabs (Categories + Diff Inspector) -->
+      <nav id="category-tabs" class="category-tabs">
+        <!-- Populated dynamically -->
+      </nav>
+
+      <!-- Main Settings Content Area -->
+      <section id="settings-container" class="settings-container">
+        <!-- Populated dynamically -->
+      </section>
+    </main>
+  </div>
+
+  <!-- Export .lcs Modal -->
+  <div id="export-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Export Leica <code>.lcs</code> Settings File</h3>
+        <button id="btn-close-export" class="btn-icon" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-desc">
+          Choose one of the recommended filename structures below or enter any custom filename.
+          When importing into your camera from an SD card, Leica cameras look for <code>settings.lcs</code>.
+        </p>
+
+        <div class="preset-section">
+          <label class="section-label">Recommended Filename Presets</label>
+          <div class="preset-cards">
+            <button type="button" id="btn-preset-standard" class="preset-card active">
+              <div class="preset-card-title">1. Camera-Ready (SD Card Standard)</div>
+              <div class="preset-card-code">settings.lcs</div>
+              <div class="preset-card-sub">Required filename for importing on the camera body</div>
+            </button>
+
+            <button type="button" id="btn-preset-camera-config" class="preset-card">
+              <div class="preset-card-title">2. Camera + Configuration Name</div>
+              <div id="preset-camera-config-preview" class="preset-card-code">LEICA_Q3_Nikolas_Setup.lcs</div>
+              <div class="preset-card-sub">Ideal for organizing multiple setups on your Mac</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="field-group modal-field">
+          <label for="input-export-filename">Filename (Open Input)</label>
+          <input
+            id="input-export-filename"
+            type="text"
+            class="text-input"
+            value="settings.lcs"
+            placeholder="Enter filename.lcs"
+          />
+        </div>
+
+        <div id="export-summary-box" class="export-summary-box">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-cancel-export" class="btn btn-ghost">Cancel</button>
+        <button id="btn-confirm-export" class="btn btn-primary">Choose Destination &amp; Save .lcs…</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
