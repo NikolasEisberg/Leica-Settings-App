@@ -84,6 +84,7 @@ npm test
 ## Project Structure
 
 ```text
+├── LICENSE                   # GNU General Public License v3.0 (GPL-3.0)
 ├── settings.lcs              # Reference Leica Q3 settings file
 ├── package.json              # Project metadata and scripts
 ├── src/
@@ -98,3 +99,9 @@ npm test
 └── test/
     └── verify-lcs.js         # Automated .lcs round-trip & schema test suite
 ```
+
+---
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)** — see the [LICENSE](LICENSE) file for details.
