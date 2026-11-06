@@ -1,6 +1,13 @@
 /* global window, document */
 
 let appState = null;
+let appPreferences = {
+  defaultFolderPath: '',
+  appearance: 'system'
+};
+let currentResolvedTheme = 'dark';
+let defaultSystemFolderPath = '';
+let currentStoreFilePath = '';
 let factoryDefaults = {};
 let schema = null;
 let inspectorSearchQuery = '';
@@ -439,7 +446,7 @@ function renderMainContent() {
   banner.className = 'category-header-banner';
   banner.innerHTML = `
     <div>
-      <h3>${cat.icon} ${escapeHtml(cat.title)} — <span style="color:#ff8593">${escapeHtml(slotDisplayName)}</span></h3>
+      <h3>${cat.icon} ${escapeHtml(cat.title)} — <span class="category-slot-accent">${escapeHtml(slotDisplayName)}</span></h3>
       <p>${escapeHtml(cat.description)}</p>
     </div>
     <div id="category-extra-actions"></div>
@@ -938,14 +945,216 @@ function escapeHtml(str) {
 }
 
 // ============================================================================
+// APPEARANCE & MACOS SETTINGS PANEL (⌘,)
+// ============================================================================
+
+function computeEffectiveTheme(appearance, resolvedFromMain) {
+  if (appearance === 'light') return 'light';
+  if (appearance === 'dark') return 'dark';
+  if (resolvedFromMain === 'light' || resolvedFromMain === 'dark') {
+    return resolvedFromMain;
+  }
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+    ? 'light'
+    : 'dark';
+}
+
+function applyThemeToDocument(appearance, resolvedFromMain) {
+  const effective = computeEffectiveTheme(appearance, resolvedFromMain);
+  currentResolvedTheme = effective;
+  document.documentElement.setAttribute('data-theme', effective);
+  renderSettingsModalState();
+}
+
+function renderSettingsModalState() {
+  const folderInput = document.getElementById('input-default-folder');
+  if (folderInput && document.activeElement !== folderInput) {
+    folderInput.value = appPreferences.defaultFolderPath || '';
+  }
+
+  const storeFileEl = document.getElementById('settings-store-filepath');
+  if (storeFileEl) {
+    storeFileEl.textContent = currentStoreFilePath || '—';
+  }
+
+  const badgeEl = document.getElementById('settings-resolved-theme-badge');
+  if (badgeEl) {
+    const modeLabel = currentResolvedTheme === 'light' ? 'Light Mode' : 'Dark Mode';
+    const sourceLabel =
+      appPreferences.appearance === 'system' ? `System → ${modeLabel}` : modeLabel;
+    badgeEl.textContent = `Active: ${sourceLabel}`;
+  }
+
+  document.querySelectorAll('.appearance-option-card').forEach((card) => {
+    const mode = card.getAttribute('data-appearance');
+    card.classList.toggle('active', mode === appPreferences.appearance);
+  });
+}
+
+async function openSettingsModal() {
+  const fresh = await window.leicaAPI.getPreferences();
+  if (fresh && fresh.preferences) {
+    appPreferences = fresh.preferences;
+    currentResolvedTheme = fresh.resolvedTheme || currentResolvedTheme;
+    defaultSystemFolderPath = fresh.defaultSystemFolderPath || defaultSystemFolderPath;
+    currentStoreFilePath = fresh.storeFilePath || currentStoreFilePath;
+  }
+  renderSettingsModalState();
+  const folderInput = document.getElementById('input-default-folder');
+  if (folderInput) {
+    folderInput.value = appPreferences.defaultFolderPath || '';
+  }
+  document.getElementById('settings-modal').classList.remove('hidden');
+}
+
+function closeSettingsModal() {
+  document.getElementById('settings-modal').classList.add('hidden');
+}
+
+async function saveFolderPathPreference(newFolderPath, toastMsg) {
+  const trimmed = (newFolderPath || '').trim();
+  if (!trimmed) {
+    showToast('Please enter a valid folder path.');
+    return;
+  }
+  const res = await window.leicaAPI.updatePreferences({
+    patch: { defaultFolderPath: trimmed },
+    currentState: appState
+  });
+  if (!res || !res.ok) {
+    showToast(res?.error || 'Failed to update default folder path');
+    return;
+  }
+  appPreferences = res.preferences;
+  currentStoreFilePath = res.storeFilePath || currentStoreFilePath;
+  const folderInput = document.getElementById('input-default-folder');
+  if (folderInput) {
+    folderInput.value = appPreferences.defaultFolderPath;
+  }
+  renderSettingsModalState();
+  showToast(toastMsg || `Default folder set to ${appPreferences.defaultFolderPath}`);
+}
+
+// ============================================================================
 // INITIALIZATION & EVENT LISTENERS
 // ============================================================================
 
 async function initApp() {
   const data = await window.leicaAPI.getInitialData();
   appState = data.state;
+  appPreferences = data.preferences || { defaultFolderPath: '', appearance: 'system' };
+  currentResolvedTheme = data.resolvedTheme || 'dark';
+  defaultSystemFolderPath = data.defaultSystemFolderPath || '';
+  currentStoreFilePath = data.storeFilePath || '';
   factoryDefaults = data.factoryDefaults || {};
   schema = data.schema;
+
+  applyThemeToDocument(appPreferences.appearance, currentResolvedTheme);
+
+  // Listen for native macOS theme changes pushed from main process
+  if (window.leicaAPI.onThemeUpdated) {
+    window.leicaAPI.onThemeUpdated(({ appearance, resolvedTheme }) => {
+      if (appearance) appPreferences.appearance = appearance;
+      applyThemeToDocument(appPreferences.appearance, resolvedTheme);
+    });
+  }
+
+  // Also listen for matchMedia changes in renderer for instant system theme sync
+  if (window.matchMedia) {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) {
+      mq.addEventListener('change', (e) => {
+        if (appPreferences.appearance === 'system') {
+          applyThemeToDocument('system', e.matches ? 'dark' : 'light');
+        }
+      });
+    }
+  }
+
+  // Listen for native macOS menu "Settings…" (⌘,)
+  if (window.leicaAPI.onOpenSettings) {
+    window.leicaAPI.onOpenSettings(() => {
+      openSettingsModal();
+    });
+  }
+
+  // Keyboard shortcuts: Cmd+, / Ctrl+, to open Settings, Escape to close modals
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === ',') {
+      e.preventDefault();
+      openSettingsModal();
+    } else if (e.key === 'Escape') {
+      closeSettingsModal();
+      document.getElementById('export-modal').classList.add('hidden');
+    }
+  });
+
+  // Settings Modal UI Listeners
+  document.getElementById('btn-open-settings').addEventListener('click', openSettingsModal);
+  document.getElementById('btn-close-settings').addEventListener('click', closeSettingsModal);
+  document.getElementById('btn-done-settings').addEventListener('click', closeSettingsModal);
+  document.getElementById('settings-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'settings-modal') {
+      closeSettingsModal();
+    }
+  });
+
+  document.querySelectorAll('.appearance-option-card').forEach((card) => {
+    card.addEventListener('click', async () => {
+      const nextAppearance = card.getAttribute('data-appearance');
+      if (!nextAppearance) return;
+      const res = await window.leicaAPI.updatePreferences({
+        patch: { appearance: nextAppearance }
+      });
+      if (res && res.ok) {
+        appPreferences = res.preferences;
+        applyThemeToDocument(appPreferences.appearance, res.resolvedTheme);
+        const labelMap = {
+          system: 'System (Auto)',
+          light: 'Light Mode',
+          dark: 'Dark Mode'
+        };
+        showToast(`Appearance set to ${labelMap[nextAppearance] || nextAppearance}`);
+      }
+    });
+  });
+
+  document.getElementById('btn-choose-folder').addEventListener('click', async () => {
+    const res = await window.leicaAPI.chooseDefaultFolder();
+    if (res && !res.canceled && res.folderPath) {
+      await saveFolderPathPreference(
+        res.folderPath,
+        `Default folder updated to ${res.folderPath}`
+      );
+    }
+  });
+
+  document.getElementById('btn-apply-folder').addEventListener('click', async () => {
+    const inputVal = document.getElementById('input-default-folder').value;
+    await saveFolderPathPreference(inputVal);
+  });
+
+  document.getElementById('input-default-folder').addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      await saveFolderPathPreference(e.target.value);
+    }
+  });
+
+  document.getElementById('btn-reset-folder').addEventListener('click', async () => {
+    if (!defaultSystemFolderPath) return;
+    await saveFolderPathPreference(
+      defaultSystemFolderPath,
+      'Reset storage folder to macOS default location'
+    );
+  });
+
+  document.getElementById('btn-reveal-folder').addEventListener('click', async () => {
+    const target =
+      document.getElementById('input-default-folder').value.trim() ||
+      appPreferences.defaultFolderPath;
+    await window.leicaAPI.openFolderInFinder(target);
+  });
 
   // Configuration Name Open Input
   document.getElementById('input-config-name').addEventListener('input', (e) => {

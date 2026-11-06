@@ -1,9 +1,13 @@
-:root {
+:root,
+[data-theme="dark"] {
   --bg-app: #0e0e10;
+  --bg-titlebar: #0b0b0d;
   --bg-sidebar: #141417;
+  --bg-profile-bar: #121216;
   --bg-surface: #1b1b20;
   --bg-surface-elevated: #232329;
   --bg-surface-hover: #2a2a32;
+  --bg-table-header: #151519;
   --border-subtle: #2c2c35;
   --border-strong: #3f3f4c;
   --text-primary: #f4f4f6;
@@ -12,14 +16,64 @@
   --leica-red: #e2001a;
   --leica-red-hover: #ff1a34;
   --leica-red-soft: rgba(226, 0, 26, 0.14);
+  --leica-red-border: rgba(226, 0, 26, 0.35);
+  --leica-red-text: #ff6b7b;
+  --leica-red-accent-text: #ff8593;
   --accent-amber: #f59e0b;
   --accent-amber-soft: rgba(245, 158, 11, 0.15);
+  --accent-amber-row: rgba(245, 158, 11, 0.06);
   --accent-green: #10b981;
+  --hex-badge-text: #93c5fd;
+  --danger-text: #f87171;
+  --danger-border: rgba(248, 113, 113, 0.3);
+  --danger-bg-hover: rgba(248, 113, 113, 0.12);
+  --surface-tint-subtle: rgba(255, 255, 255, 0.03);
+  --surface-tint-hover: rgba(255, 255, 255, 0.025);
+  --modal-backdrop: rgba(0, 0, 0, 0.72);
+  --modal-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+  --toast-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
   --font-mono: "SF Mono", Menlo, Monaco, Consolas, monospace;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg-app: #f5f5f7;
+  --bg-titlebar: #e8e8ed;
+  --bg-sidebar: #ededf2;
+  --bg-profile-bar: #e6e6ec;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f2f2f7;
+  --bg-surface-hover: #e5e5ea;
+  --bg-table-header: #efeff4;
+  --border-subtle: #d8d8e0;
+  --border-strong: #bcbcc8;
+  --text-primary: #16161a;
+  --text-secondary: #4a4a57;
+  --text-muted: #767686;
+  --leica-red: #d40018;
+  --leica-red-hover: #b80015;
+  --leica-red-soft: rgba(212, 0, 24, 0.1);
+  --leica-red-border: rgba(212, 0, 24, 0.3);
+  --leica-red-text: #c20016;
+  --leica-red-accent-text: #c20016;
+  --accent-amber: #b45309;
+  --accent-amber-soft: rgba(217, 119, 6, 0.14);
+  --accent-amber-row: rgba(217, 119, 6, 0.07);
+  --accent-green: #059669;
+  --hex-badge-text: #1d4ed8;
+  --danger-text: #dc2626;
+  --danger-border: rgba(220, 38, 38, 0.3);
+  --danger-bg-hover: rgba(220, 38, 38, 0.08);
+  --surface-tint-subtle: rgba(0, 0, 0, 0.035);
+  --surface-tint-hover: rgba(0, 0, 0, 0.025);
+  --modal-backdrop: rgba(15, 15, 20, 0.42);
+  --modal-shadow: 0 20px 44px rgba(0, 0, 0, 0.22);
+  --toast-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+  color-scheme: light;
 }
 
 * {
@@ -39,17 +93,18 @@ body {
   display: flex;
   flex-direction: column;
   user-select: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 /* Titlebar */
 .app-titlebar {
-  height: 40px;
-  background: #0b0b0d;
+  height: 42px;
+  background: var(--bg-titlebar);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 18px 0 84px;
+  padding: 0 16px 0 84px;
   -webkit-app-region: drag;
   flex-shrink: 0;
 }
@@ -60,17 +115,17 @@ body {
   gap: 10px;
 }
 
-.leica-red-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--leica-red);
-  box-shadow: 0 0 8px rgba(226, 0, 26, 0.65);
+.titlebar-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
   display: inline-block;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 .titlebar-title {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: var(--text-primary);
@@ -83,6 +138,13 @@ body {
   padding-left: 10px;
 }
 
+.titlebar-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  -webkit-app-region: no-drag;
+}
+
 .status-pill {
   font-size: 11px;
   color: var(--text-secondary);
@@ -90,6 +152,33 @@ body {
   border: 1px solid var(--border-subtle);
   padding: 2px 9px;
   border-radius: 999px;
+}
+
+.btn-titlebar-icon {
+  -webkit-app-region: no-drag;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-titlebar-icon:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-elevated);
+  border-color: var(--border-strong);
+}
+
+.icon-gear {
+  flex-shrink: 0;
 }
 
 /* Layout */
@@ -183,8 +272,8 @@ body {
   padding: 2px 6px;
   border-radius: 4px;
   background: var(--leica-red-soft);
-  color: #ff6b7b;
-  border: 1px solid rgba(226, 0, 26, 0.35);
+  color: var(--leica-red-text);
+  border: 1px solid var(--leica-red-border);
   flex-shrink: 0;
 }
 
@@ -214,7 +303,7 @@ body {
   border-radius: var(--radius-md);
   padding: 10px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.015);
+  background: var(--surface-tint-subtle);
   transition: all 0.15s ease;
 }
 
@@ -302,7 +391,7 @@ body {
   font-size: 13px;
   font-family: var(--font-sans);
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .text-input:focus,
@@ -374,18 +463,18 @@ body {
 
 .btn-ghost-danger {
   background: transparent;
-  color: #f87171;
-  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
 }
 
 .btn-ghost-danger:hover {
-  background: rgba(248, 113, 113, 0.12);
+  background: var(--danger-bg-hover);
 }
 
 /* Profile Bar */
 .profile-bar {
   padding: 12px 20px;
-  background: #121216;
+  background: var(--bg-profile-bar);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
@@ -497,7 +586,7 @@ body {
 }
 
 .profile-tab-diff-pill.clean {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--surface-tint-subtle);
   color: var(--text-muted);
 }
 
@@ -576,7 +665,7 @@ body {
 
 .category-tab:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-tint-hover);
 }
 
 .category-tab.active {
@@ -619,6 +708,10 @@ body {
   font-weight: 600;
 }
 
+.category-slot-accent {
+  color: var(--leica-red-accent-text);
+}
+
 .category-header-banner p {
   font-size: 12px;
   color: var(--text-secondary);
@@ -645,7 +738,7 @@ body {
 
 .setting-card.modified {
   border-color: rgba(245, 158, 11, 0.45);
-  background: linear-gradient(180deg, rgba(245, 158, 11, 0.04) 0%, var(--bg-surface) 100%);
+  background: linear-gradient(180deg, var(--accent-amber-row) 0%, var(--bg-surface) 100%);
 }
 
 .setting-card-top {
@@ -669,7 +762,7 @@ body {
   padding: 2px 6px;
   border-radius: 4px;
   background: var(--bg-surface-elevated);
-  color: #93c5fd;
+  color: var(--hex-badge-text);
   border: 1px solid var(--border-strong);
 }
 
@@ -712,7 +805,7 @@ body {
   align-items: center;
   gap: 4px;
   padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--border-subtle);
   font-family: var(--font-mono);
   font-size: 10.5px;
   color: var(--text-muted);
@@ -721,12 +814,12 @@ body {
 .slot-mini-pill {
   padding: 1px 5px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-tint-subtle);
 }
 
 .slot-mini-pill.active-slot {
   background: var(--leica-red-soft);
-  color: #ff8593;
+  color: var(--leica-red-accent-text);
   font-weight: 600;
 }
 
@@ -794,7 +887,7 @@ body {
 }
 
 .inspector-table th {
-  background: #151519;
+  background: var(--bg-table-header);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -803,11 +896,11 @@ body {
 }
 
 .inspector-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--surface-tint-hover);
 }
 
 .inspector-table tr.row-diff td {
-  background: rgba(245, 158, 11, 0.05);
+  background: var(--accent-amber-row);
 }
 
 .slot-cell {
@@ -824,8 +917,8 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(4px);
+  background: var(--modal-backdrop);
+  backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -842,7 +935,7 @@ body {
   background: var(--bg-surface);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--modal-shadow);
   overflow: hidden;
 }
 
@@ -866,6 +959,13 @@ body {
   color: var(--text-secondary);
   font-size: 15px;
   cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-icon:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-elevated);
 }
 
 .modal-body {
@@ -925,7 +1025,7 @@ body {
 .preset-card-code {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: #ff8593;
+  color: var(--leica-red-accent-text);
   margin-bottom: 4px;
   word-break: break-all;
 }
@@ -958,6 +1058,171 @@ body {
   gap: 10px;
 }
 
+/* macOS Settings Panel Modal */
+.settings-modal-card {
+  width: 620px;
+}
+
+.settings-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-header-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.settings-header-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: block;
+}
+
+.settings-modal-body {
+  gap: 18px;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-group-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-group-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.settings-divider {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.appearance-segmented-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.appearance-option-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.appearance-option-card:hover {
+  border-color: var(--text-secondary);
+}
+
+.appearance-option-card.active {
+  border-color: var(--leica-red);
+  background: var(--leica-red-soft);
+  box-shadow: 0 0 0 1px var(--leica-red);
+}
+
+.appearance-preview {
+  height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+
+.appearance-preview-dark {
+  background: #141418;
+}
+
+.appearance-preview-light {
+  background: #f4f4f8;
+}
+
+.appearance-preview-system .preview-half {
+  flex: 1;
+  height: 100%;
+}
+
+.appearance-preview-system .preview-half-dark {
+  background: #141418;
+}
+
+.appearance-preview-system .preview-half-light {
+  background: #f4f4f8;
+}
+
+.preview-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e2001a;
+  box-shadow: 0 0 6px rgba(226, 0, 26, 0.6);
+}
+
+.appearance-option-title {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.appearance-option-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.folder-path-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.folder-path-input {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.folder-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.folder-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-path-meta code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
 /* Toast */
 .toast {
   position: fixed;
@@ -970,6 +1235,6 @@ body {
   padding: 10px 16px;
   font-size: 12.5px;
   font-weight: 500;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--toast-shadow);
   z-index: 200;
 }
