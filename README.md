@@ -1,8 +1,8 @@
-# Leica Settings Studio
+# Leica Dial & Dot
 
 A cross-platform Electron desktop application for viewing, comparing, and adjusting **Leica camera settings (`.lcs` files)** without navigating on-camera menus.
 
-Export your `settings.lcs` file from your Leica camera onto an SD card, open it in **Leica Settings Studio** to manage user profiles and camera parameters via structured dropdowns, and export the adjusted `settings.lcs` file back to your SD card.
+Export your `settings.lcs` file from your Leica camera onto an SD card, open it in **Leica Dial & Dot** to manage user profiles and camera parameters via structured dropdowns, and export the adjusted `settings.lcs` file back to your SD card.
 
 ---
 
@@ -14,6 +14,10 @@ Export your `settings.lcs` file from your Leica camera onto an SD card, open it 
 * **Persistent Multi-Configuration Library:**
   * Maintain multiple camera setups (e.g., *Street*, *Studio*, *Travel*, *Factory Default Baseline*) across sessions.
   * Duplicate, rename, and switch between configurations at any time.
+* **macOS Settings Panel (`⌘,`) & Appearance Modes:**
+  * Open Settings via the native macOS application menu (**Leica Dial & Dot** $\rightarrow$ **Settings…**, `⌘,`) or the **Settings** button in the titlebar.
+  * **Appearance:** Switch between **System (Auto)**, **Light Mode**, and **Dark Mode** with automatic macOS system appearance synchronization.
+  * **Default Storage & `.lcs` Folder Path:** Configure the default directory where the persistent configuration library is stored and where Import/Export `.lcs` dialogs open by default.
 * **7-Slot Camera Profile Manager:**
   * Manage the camera's **Active State** (`Slot 0`) alongside all 6 named **User Profiles** (`Profile 1` – `Profile 6`).
   * Rename profiles (`3–10` characters) using an open input field or quick-select name presets.
@@ -41,7 +45,7 @@ Export your `settings.lcs` file from your Leica camera onto an SD card, open it 
 
 1. **Export from Camera to SD Card:**
    On your Leica Q3, navigate to **Menu** $\rightarrow$ **User Profile** $\rightarrow$ **Manage Profiles** $\rightarrow$ **Export Profiles**. This writes `settings.lcs` to your SD card.
-2. **Adjust in Leica Settings Studio:**
+2. **Adjust in Leica Dial & Dot:**
    Import `settings.lcs` into the app, customize your profiles and settings, and export the updated file.
 3. **Import Back to Camera:**
    Save the exported file as `settings.lcs` on your SD card, insert the card into your camera, and select **Menu** $\rightarrow$ **User Profile** $\rightarrow$ **Manage Profiles** $\rightarrow$ **Import Profiles**.
@@ -88,14 +92,17 @@ npm test
 ├── settings.lcs              # Reference Leica Q3 settings file
 ├── package.json              # Project metadata and scripts
 ├── src/
-│   ├── main.js               # Electron main process, file dialogs & session persistence
+│   ├── main.js               # Electron main process, macOS menu, preferences & session persistence
 │   ├── preload.js            # Context-isolated IPC bridge
 │   ├── lcs-codec.js          # Lossless .lcs parser and byte-accurate serializer
 │   ├── settings-schema.js    # Categorized camera settings dictionary & dropdown options
+│   ├── assets/
+│   │   ├── logo.svg          # Knurled Dial & Sliders Badge vector logo
+│   │   └── icon.png          # High-resolution macOS application & Dock icon
 │   └── renderer/
-│       ├── index.html        # Application layout & export modal
-│       ├── styles.css        # Dark Leica-inspired UI theme
-│       └── app.js            # Renderer state, profile manager & diff inspector
+│       ├── index.html        # Application layout, Settings modal (⌘,) & export modal
+│       ├── styles.css        # Light & Dark Leica-inspired UI themes
+│       └── app.js            # Renderer state, appearance sync, profile manager & diff inspector
 └── test/
     └── verify-lcs.js         # Automated .lcs round-trip & schema test suite
 ```

@@ -1,21 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Leica Settings Studio</title>
+  <title>Leica Dial &amp; Dot</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- macOS Draggable Titlebar -->
   <header class="app-titlebar">
     <div class="titlebar-brand">
-      <span class="leica-red-dot" title="Leica Settings Studio"></span>
-      <span class="titlebar-title">LEICA SETTINGS STUDIO</span>
+      <img
+        src="../assets/logo.svg"
+        alt="Leica Dial &amp; Dot Logo"
+        title="Leica Dial &amp; Dot"
+        class="titlebar-logo"
+      />
+      <span class="titlebar-title">LEICA DIAL &amp; DOT</span>
       <span class="titlebar-subtitle">Camera Configuration &amp; .LCS Profile Manager</span>
     </div>
     <div class="titlebar-status">
       <span id="save-status-indicator" class="status-pill">All changes saved</span>
+      <button
+        id="btn-open-settings"
+        type="button"
+        class="btn-titlebar-icon"
+        title="Settings (⌘,)"
+        aria-label="Open Settings"
+      >
+        <svg class="icon-gear" viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="2.8" />
+          <path d="M16.2 12.3a1.3 1.3 0 0 0 .26 1.43l.05.05a1.58 1.58 0 1 1-2.23 2.23l-.05-.05a1.3 1.3 0 0 0-1.43-.26 1.3 1.3 0 0 0-.8 1.2v.14a1.58 1.58 0 0 1-3.16 0v-.07a1.3 1.3 0 0 0-.85-1.2 1.3 1.3 0 0 0-1.43.26l-.05.05a1.58 1.58 0 1 1-2.23-2.23l.05-.05a1.3 1.3 0 0 0 .26-1.43 1.3 1.3 0 0 0-1.2-.8H3.3a1.58 1.58 0 0 1 0-3.16h.07a1.3 1.3 0 0 0 1.2-.85 1.3 1.3 0 0 0-.26-1.43l-.05-.05a1.58 1.58 0 1 1 2.23-2.23l.05.05a1.3 1.3 0 0 0 1.43.26h.06a1.3 1.3 0 0 0 .79-1.2V3.3a1.58 1.58 0 0 1 3.16 0v.07a1.3 1.3 0 0 0 .79 1.2 1.3 1.3 0 0 0 1.43-.26l.05-.05a1.58 1.58 0 1 1 2.23 2.23l-.05.05a1.3 1.3 0 0 0-.26 1.43v.06a1.3 1.3 0 0 0 1.2.79h.14a1.58 1.58 0 0 1 0 3.16h-.07a1.3 1.3 0 0 0-1.2.79Z" />
+        </svg>
+        <span>Settings</span>
+      </button>
     </div>
   </header>
 
@@ -155,6 +173,115 @@
         <!-- Populated dynamically -->
       </section>
     </main>
+  </div>
+
+  <!-- macOS Settings Modal (⌘,) -->
+  <div id="settings-modal" class="modal-backdrop hidden">
+    <div class="modal-card settings-modal-card" role="dialog" aria-labelledby="settings-modal-title">
+      <div class="modal-header settings-modal-header">
+        <div class="settings-header-brand">
+          <img src="../assets/logo.svg" alt="Leica Dial &amp; Dot" class="settings-header-logo" />
+          <div>
+            <h3 id="settings-modal-title">Leica Dial &amp; Dot Settings</h3>
+            <span class="settings-header-sub">macOS Application Preferences (⌘,)</span>
+          </div>
+        </div>
+        <button id="btn-close-settings" class="btn-icon" aria-label="Close Settings">✕</button>
+      </div>
+
+      <div class="modal-body settings-modal-body">
+        <!-- 1. Appearance Setting -->
+        <div class="settings-group">
+          <div class="settings-group-header">
+            <div>
+              <label class="section-label" style="margin-bottom:2px;">Appearance</label>
+              <p class="settings-group-desc">
+                Choose how Leica Dial &amp; Dot looks, or automatically match your macOS system appearance.
+              </p>
+            </div>
+            <span id="settings-resolved-theme-badge" class="status-pill">Active: Dark</span>
+          </div>
+
+          <div class="appearance-segmented-grid">
+            <button type="button" class="appearance-option-card" data-appearance="system">
+              <div class="appearance-preview appearance-preview-system">
+                <div class="preview-half preview-half-dark"></div>
+                <div class="preview-half preview-half-light"></div>
+                <span class="preview-dot"></span>
+              </div>
+              <div class="appearance-option-title">System (Auto)</div>
+              <div class="appearance-option-sub">Follows macOS Light &amp; Dark schedule</div>
+            </button>
+
+            <button type="button" class="appearance-option-card" data-appearance="light">
+              <div class="appearance-preview appearance-preview-light">
+                <span class="preview-dot"></span>
+              </div>
+              <div class="appearance-option-title">Light</div>
+              <div class="appearance-option-sub">Bright silver &amp; daylight studio theme</div>
+            </button>
+
+            <button type="button" class="appearance-option-card" data-appearance="dark">
+              <div class="appearance-preview appearance-preview-dark">
+                <span class="preview-dot"></span>
+              </div>
+              <div class="appearance-option-title">Dark</div>
+              <div class="appearance-option-sub">Anodized black camera body theme</div>
+            </button>
+          </div>
+        </div>
+
+        <hr class="settings-divider" />
+
+        <!-- 2. Default Folder Path Setting -->
+        <div class="settings-group">
+          <label class="section-label" style="margin-bottom:2px;" for="input-default-folder">
+            Default Storage &amp; .LCS Folder Path
+          </label>
+          <p class="settings-group-desc">
+            Location where Leica Dial &amp; Dot stores its persistent configuration library and opens Import/Export <code>.lcs</code> dialogs by default.
+          </p>
+
+          <div class="folder-path-row">
+            <input
+              id="input-default-folder"
+              type="text"
+              class="text-input folder-path-input"
+              placeholder="/Users/you/..."
+              spellcheck="false"
+            />
+            <button id="btn-choose-folder" type="button" class="btn btn-secondary">
+              Choose Folder…
+            </button>
+          </div>
+
+          <div class="folder-actions-bar">
+            <div class="folder-actions-left">
+              <button id="btn-reveal-folder" type="button" class="btn btn-ghost btn-sm">
+                Reveal in Finder
+              </button>
+              <button id="btn-reset-folder" type="button" class="btn btn-ghost btn-sm">
+                Reset to Default Location
+              </button>
+            </div>
+            <button id="btn-apply-folder" type="button" class="btn btn-primary btn-sm">
+              Save Folder Path
+            </button>
+          </div>
+
+          <div class="export-summary-box settings-path-meta">
+            <div>
+              <strong>Library Store File:</strong>
+              <code id="settings-store-filepath">—</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-done-settings" type="button" class="btn btn-primary">Done</button>
+      </div>
+    </div>
   </div>
 
   <!-- Export .lcs Modal -->

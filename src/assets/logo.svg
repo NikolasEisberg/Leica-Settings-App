@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <defs>
+    <!-- macOS Squircle Base Gradient -->
+    <linearGradient id="badgeBg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#26262e" />
+      <stop offset="50%" stop-color="#17171c" />
+      <stop offset="100%" stop-color="#0d0d10" />
+    </linearGradient>
+
+    <!-- Metallic Outer Bezel -->
+    <linearGradient id="outerBezel" x1="64" y1="40" x2="448" y2="472" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6b6b78" />
+      <stop offset="35%" stop-color="#3a3a44" />
+      <stop offset="70%" stop-color="#222228" />
+      <stop offset="100%" stop-color="#4e4e5a" />
+    </linearGradient>
+
+    <!-- Machined Dial Face Gradient -->
+    <linearGradient id="dialFace" x1="110" y1="110" x2="402" y2="402" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2e2e37" />
+      <stop offset="50%" stop-color="#1d1d23" />
+      <stop offset="100%" stop-color="#121216" />
+    </linearGradient>
+
+    <!-- Knurled Rim Metallic Ring -->
+    <linearGradient id="knurlRing" x1="96" y1="96" x2="416" y2="416" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8e8e9e" />
+      <stop offset="50%" stop-color="#454552" />
+      <stop offset="100%" stop-color="#292932" />
+    </linearGradient>
+
+    <!-- Leica Red Dot Glow -->
+    <radialGradient id="redDotGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ff4d61" />
+      <stop offset="45%" stop-color="#e2001a" />
+      <stop offset="100%" stop-color="#9e0012" />
+    </radialGradient>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.55" />
+    </filter>
+  </defs>
+
+  <!-- macOS Rounded Squircle Background -->
+  <rect x="24" y="24" width="464" height="464" rx="108" fill="url(#badgeBg)" stroke="url(#outerBezel)" stroke-width="8" />
+
+  <!-- Subtle Inner Squircle Highlight -->
+  <rect x="36" y="36" width="440" height="440" rx="96" stroke="#ffffff" stroke-opacity="0.06" stroke-width="2" />
+
+  <!-- Machined Camera Dial Base Shadow & Knurled Outer Ring -->
+  <g filter="url(#dropShadow)">
+    <circle cx="256" cy="256" r="176" fill="url(#knurlRing)" />
+    <!-- Knurled Grip Notches -->
+    <circle
+      cx="256"
+      cy="256"
+      r="168"
+      fill="none"
+      stroke="#111115"
+      stroke-width="14"
+      stroke-dasharray="6.8 6.95"
+    />
+    <!-- Inner Bevel of Dial -->
+    <circle cx="256" cy="256" r="154" fill="url(#dialFace)" stroke="#5c5c6b" stroke-width="3" />
+    <circle cx="256" cy="256" r="142" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="1.5" />
+  </g>
+
+  <!-- Engraved Degree / Shutter Index Ticks Around Top-Left Arc -->
+  <g stroke="#8e8e9d" stroke-linecap="round" opacity="0.7">
+    <line x1="256" y1="122" x2="256" y2="134" stroke-width="3" />
+    <line x1="210" y1="130" x2="214" y2="141" stroke-width="2.5" />
+    <line x1="169" y1="153" x2="177" y2="162" stroke-width="2.5" />
+    <line x1="139" y1="189" x2="149" y2="195" stroke-width="2.5" />
+    <line x1="302" y1="130" x2="298" y2="141" stroke-width="2.5" />
+  </g>
+
+  <!-- Configuration Sliders Engraved into Dial Face -->
+  <!-- Slider 1 (Top) -->
+  <g>
+    <rect x="156" y="198" width="200" height="12" rx="6" fill="#0f0f13" stroke="#383844" stroke-width="2" />
+    <rect x="156" y="198" width="122" height="12" rx="6" fill="#e2001a" />
+    <circle cx="278" cy="204" r="15" fill="#f4f4f6" stroke="#141418" stroke-width="3" />
+    <circle cx="278" cy="204" r="5" fill="#e2001a" />
+  </g>
+
+  <!-- Slider 2 (Middle) -->
+  <g>
+    <rect x="156" y="250" width="200" height="12" rx="6" fill="#0f0f13" stroke="#383844" stroke-width="2" />
+    <rect x="156" y="250" width="68" height="12" rx="6" fill="#a6a6b4" />
+    <circle cx="224" cy="256" r="15" fill="#f4f4f6" stroke="#141418" stroke-width="3" />
+  </g>
+
+  <!-- Slider 3 (Bottom) -->
+  <g>
+    <rect x="156" y="302" width="200" height="12" rx="6" fill="#0f0f13" stroke="#383844" stroke-width="2" />
+    <rect x="156" y="302" width="148" height="12" rx="6" fill="#a6a6b4" />
+    <circle cx="304" cy="308" r="15" fill="#f4f4f6" stroke="#141418" stroke-width="3" />
+  </g>
+
+  <!-- Signature Leica Red Index Dot (Top-Right of Dial) -->
+  <g filter="url(#dropShadow)">
+    <circle cx="348" cy="164" r="24" fill="url(#redDotGrad)" stroke="#ff8593" stroke-opacity="0.45" stroke-width="2" />
+    <circle cx="341" cy="157" r="6" fill="#ffffff" fill-opacity="0.35" />
+  </g>
+</svg>

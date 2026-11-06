@@ -11,7 +11,9 @@ const {
 } = require('../src/lcs-codec');
 const { SETTINGS_SCHEMA, CATEGORIES, getOptionsForKey } = require('../src/settings-schema');
 
-const lcsPath = path.join(__dirname, '..', 'settings.lcs');
+const rootLcsPath = path.join(__dirname, '..', 'settings.lcs');
+const sampleLcsPath = path.join(__dirname, '..', 'lcs_samples', 'q3_28', 'settings.lcs');
+const lcsPath = fs.existsSync(rootLcsPath) ? rootLcsPath : sampleLcsPath;
 const raw = fs.readFileSync(lcsPath, 'utf-8');
 
 // 1. Test round-trip byte-for-byte fidelity
@@ -48,4 +50,25 @@ for (const key of parsed.keyOrder) {
   assert.ok(Array.isArray(opts) && opts.length > 0, `Key ${key} should have dropdown options`);
 }
 
-console.log('✓ All .lcs codec, diff inspector filter, and schema verification tests passed (346 keys, byte-identical output).');
+// 5. Verify Leica Dial & Dot branding, logo assets, Light/Dark themes & macOS Settings modal
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+assert.strictEqual(pkg.productName, 'Leica Dial & Dot');
+
+const svgPath = path.join(__dirname, '..', 'src', 'assets', 'logo.svg');
+const pngPath = path.join(__dirname, '..', 'src', 'assets', 'icon.png');
+assert.ok(fs.existsSync(svgPath), 'logo.svg must exist');
+assert.ok(fs.existsSync(pngPath), 'icon.png must exist');
+
+const html = fs.readFileSync(path.join(__dirname, '..', 'src', 'renderer', 'index.html'), 'utf-8');
+assert.ok(html.includes('Leica Dial &amp; Dot'), 'index.html should display Leica Dial & Dot');
+assert.ok(html.includes('id="settings-modal"'), 'index.html should contain macOS Settings modal');
+assert.ok(html.includes('id="input-default-folder"'), 'index.html should include default folder path setting');
+assert.ok(html.includes('data-appearance="system"'), 'index.html should include System appearance option');
+assert.ok(html.includes('data-appearance="light"'), 'index.html should include Light appearance option');
+assert.ok(html.includes('data-appearance="dark"'), 'index.html should include Dark appearance option');
+
+const css = fs.readFileSync(path.join(__dirname, '..', 'src', 'renderer', 'styles.css'), 'utf-8');
+assert.ok(css.includes('[data-theme="dark"]'), 'styles.css must define Dark Mode theme');
+assert.ok(css.includes('[data-theme="light"]'), 'styles.css must define Light Mode theme');
+
+console.log('✓ All .lcs codec, diff inspector filter, branding, theme, and schema verification tests passed (346 keys, byte-identical output).');
