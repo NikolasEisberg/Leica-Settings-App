@@ -6,8 +6,10 @@
   "description": "Desktop application to view, compare, and adjust Leica camera settings (.lcs files)",
   "main": "src/main.js",
   "scripts": {
+    "postinstall": "node src/patch-mac-bundle.js",
+    "prestart": "node src/patch-mac-bundle.js",
     "start": "electron .",
-    "start:mac": "./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron .",
+    "start:mac": "node src/patch-mac-bundle.js && \"./node_modules/electron/dist/Leica Dial & Dot.app/Contents/MacOS/Electron\" .",
     "test": "node test/verify-lcs.js"
   },
   "devDependencies": {

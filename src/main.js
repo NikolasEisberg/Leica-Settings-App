@@ -37,6 +37,13 @@ const BUNDLED_LCS_CANDIDATES = [
 const APP_ICON_PATH = path.join(__dirname, 'assets', 'icon.png');
 
 app.setName(APP_NAME);
+if (process.platform === 'darwin' && typeof app.setAboutPanelOptions === 'function') {
+  app.setAboutPanelOptions({
+    applicationName: APP_NAME,
+    applicationVersion: '1.0.0',
+    iconPath: APP_ICON_PATH
+  });
+}
 
 function getDefaultBaseDir() {
   try {
